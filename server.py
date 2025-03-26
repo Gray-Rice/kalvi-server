@@ -42,6 +42,89 @@ def login():
         return jsonify({"error": error}), 401
 
 
+############################################# Course
+
+@app.route("/admin/course", methods=["GET"])
+def admin_course():
+    """Retrieve all courses (Admin only)."""
+    token = request.headers.get("X-API-KEY")
+    if sec.check_token(token, "admin") == False:
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
+
+    return jsonify({"courses": course.get()}), 200
+
+############################################################ Course paths
+
+@app.route("/add/course", methods=["POST"])
+def add_course():
+    """Add a new course (Admin only)."""
+    token = request.headers.get("X-API-KEY")
+    if sec.check_token(token, "admin") == False:
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid input format"}), 400
+
+    course_data = [
+        data.get("code", "").strip(),
+        data.get("course", "").strip(),
+        data.get("description", "").strip()
+    ]
+
+    if not all(course_data):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    if course.add(course_data):
+        return jsonify({"message": f"Course '{course_data[1]}' added successfully"}), 201
+    else:
+        return jsonify({"error": f"Course '{course_data[1]}' already exists"}), 400
+
+@app.route("/edit/course", methods=["POST"])
+def edit_course():
+    """Edit a course (Admin only)."""
+    token = request.headers.get("X-API-KEY")
+    if sec.check_token(token, "admin") == False:
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid input format"}), 400
+
+    update_data = [
+        data.get("course").strip(),
+        data.get("description").strip(),
+    ]
+
+    if not all(update_data):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    if course.update(update_data):
+        return jsonify({"message": "Course updated successfully"}), 200
+    else:
+        return jsonify({"error": "Error occurred, try again"}), 400
+
+@app.route("/delete/course", methods=["POST"])
+def rm_course():
+    """Delete a course (Admin only)."""
+    token = request.headers.get("X-API-KEY")
+    if sec.check_token(token, "admin") == False:
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
+
+    data = request.get_json()
+    course_id = data.get("course_id")
+
+    if not course_id:
+        return jsonify({"error": "Missing course ID"}), 400
+
+    if course.remove(course_id):
+        return jsonify({"message": "Course deleted successfully"}), 200
+    else:
+        return jsonify({"error": "Error occurred, try again"}), 400
+
+
+############################################# User Management
+
 @app.route('/admin/users', methods=['GET'])
 def admin_user():
     token = request.headers.get("X-API-KEY")
@@ -65,12 +148,6 @@ def add_user():
         data.get('qualification').strip(),
         data.get('dob')
     ]
-    
-    if not util.valid_mail(user_data[0]):
-        return jsonify({"error": "Username Error: Not a valid email"}), 400
-    
-    if any(i == "" for i in user_data):
-        return jsonify({"error": "Input Error: Check if values entered are correct"}), 400
     
     if uobj.add(user_data):
         return jsonify({"message": "User added successfully"}), 201
@@ -107,13 +184,7 @@ def add_staff():
         data.get('dob')
     ]
     
-    if not util.valid_mail(user_data[0]):
-        return jsonify({"error": "Username Error: Not a valid email"}), 400
-    
-    if any(i == "" for i in user_data):
-        return jsonify({"error": "Input Error: Check if values entered are correct"}), 400
-    
-    if uobj.add(user_data):
+    if uobj.add(user_data,"staff"):
         return jsonify({"message": "User added successfully"}), 201
     else:
         return jsonify({"error": f"Username {user_data[0]} already exists."}), 400
