@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, session
+from flask_cors import CORS 
 from ast import literal_eval
 
 # User-defined modules
@@ -10,6 +11,8 @@ from modules.utilities import apitools
 uobj = dbm.users()
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
+
 print("Getting Secrets....")
 secrets = sec.get_secrets()
 if secrets is not None:

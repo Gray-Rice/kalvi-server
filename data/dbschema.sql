@@ -18,33 +18,24 @@ CREATE TABLE Api (
     token TEXT UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
--- CREATE TABLE Subjects (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     code TEXT NOT NULL UNIQUE,
---     name TEXT NOT NULL,
---     description TEXT
--- );
 
+CREATE TABLE Courses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    description TEXT
+);
 
--- CREATE TABLE Chapters (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     subject_id INTEGER NOT NULL,
---     chap_code TEXT NOT NULL UNIQUE,
---     name TEXT NOT NULL,
---     description TEXT,
---     FOREIGN KEY (subject_id) REFERENCES Subjects(id) ON DELETE CASCADE
--- );
-
--- CREATE TABLE Quiz (
---     id INTEGER PRIMARY KEY AUTOINCREMENT,
---     chapter_id INTEGER NOT NULL,
---     name TEXT NOT NULL,
---     start_date DATETIME NOT NULL,
---     end_date DATETIME NOT NULL,
---     duration TEXT NOT NULL,
---     description TEXT,
---     FOREIGN KEY (chapter_id) REFERENCES Chapters(id) ON DELETE CASCADE
--- );
+CREATE TABLE Quiz (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    course_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    duration TEXT NOT NULL,
+    description TEXT,
+    FOREIGN KEY (chapter_id) REFERENCES Chapters(id) ON DELETE CASCADE
+);
 
 -- CREATE TABLE Questions (
 --     id INTEGER PRIMARY KEY AUTOINCREMENT,
