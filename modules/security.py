@@ -1,6 +1,6 @@
 import hashlib, os, pickle, sqlite3, secrets, json
 from datetime import date
-import modules.dbmanage as dbm
+from modules.dbmanage import users
 
 def get_secrets():
     try:
@@ -66,8 +66,9 @@ def check_token(token):
         cur.execute("SELECT * FROM Api WHERE token = ? ",(token,))
         api = cur.fetchone()
         if(api):
+            user = users.search(id=api[1])
             print(f"API Authorized for user ID: {api[1]}")
-            return True
+            return user
         else:
             return False
 
@@ -126,8 +127,7 @@ def verify_hash(password, pwdhash):
 
 def verify_login(username,enteredpwd):
     from modules.dbmanage import users
-    obj = users()
-    user = obj.search(username)
+    user = users.search(username)
     if  user != None:
         if verify_hash(enteredpwd,user["pwd"]):
             del user["pwd"]

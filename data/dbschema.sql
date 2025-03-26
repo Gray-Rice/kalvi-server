@@ -9,7 +9,7 @@ CREATE TABLE Users (
     fullname TEXT NOT NULL,
     qualification TEXT,
     dob DATE NOT NULL,
-    role TEXT CHECK(role IN ('admin', 'user')) NOT NULL DEFAULT 'user' 
+    role TEXT CHECK(role IN ('admin', 'user', 'faculty')) NOT NULL DEFAULT 'user' 
 );
 
 CREATE TABLE Api (
@@ -26,7 +26,7 @@ CREATE TABLE Courses (
     description TEXT
 );
 
-CREATE TABLE Quiz (
+CREATE TABLE Assignment (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id INTEGER NOT NULL,
     name TEXT NOT NULL,

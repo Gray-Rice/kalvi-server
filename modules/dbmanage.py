@@ -1,8 +1,10 @@
 import sqlite3
 from datetime import date
-from modules.security import hashpwd
+import hashlib
 
-    
+def hashpwd(password): 
+    return hashlib.sha256(password.encode()).hexdigest()
+
 def get_role(username):
     with sqlite3.connect("data/instance.db") as con:
         cur = con.cursor()
@@ -12,13 +14,13 @@ def get_role(username):
             return user[0]
 
 class users():
-    def add(self,user):
+    def add(self,user,role="student"):
         with sqlite3.connect("data/instance.db") as con:
             try:
                 user[0] = user[0].strip()
                 user[1] = hashpwd(user[1].strip())
                 cur = con.cursor()
-                cur.execute(f'''INSERT INTO Users (username, password, fullname, qualification, dob) VALUES (?,?,?,?,?)''',user)
+                cur.execute(f'''INSERT INTO Users (username, password, fullname, qualification, dob, role) VALUES (?,?,?,?,?,?)''',user)
                 con.commit()
                 print("Added User: "+user[0])
                 return True
@@ -44,7 +46,8 @@ class users():
             user = cur.fetchone()
             return user[0]
 
-    def search(self,username=None,id=None):
+    @staticmethod
+    def search(username=None,id=None):
         with sqlite3.connect("data/instance.db") as con:
             cur = con.cursor()
             if(username not in (None,"")):
@@ -74,12 +77,12 @@ class users():
                 print("Exception : "+str(e))
                 return False
 
-class subject:
+class course:
     def add(self,sub_data):
         with sqlite3.connect("data/instance.db") as con:
             try:
                 cur = con.cursor()
-                cur.execute(f'''INSERT INTO Subjects (code,name, description) VALUES (?,?,?)''',sub_data)
+                cur.execute(f'''INSERT INTO Courses (code,name, description) VALUES (?,?,?)''',sub_data)
                 con.commit()
                 print("Added Subject: "+sub_data[1])
                 return True
@@ -90,25 +93,25 @@ class subject:
     def get(self):
         with sqlite3.connect("data/instance.db") as con:
             cur = con.cursor()
-            cur.execute(f'''SELECT * from Subjects''')
+            cur.execute(f'''SELECT * from Courses''')
             subjects = cur.fetchall()
             return subjects
 
     def name(self,id):
         with sqlite3.connect("data/instance.db") as con:
             cur = con.cursor()
-            cur.execute(f'''SELECT name from Subjects WHERE id = ?''',(id,))
+            cur.execute(f'''SELECT name from Courses WHERE id = ?''',(id,))
             subject = cur.fetchone()
             return subject[0]
 
-    def remove(self,sub_id):
+    def remove(self,cur_id):
         with sqlite3.connect("data/instance.db") as con:
             try:
                 cur = con.cursor()
                 cur.execute("PRAGMA foreign_keys = ON;")
-                cur.execute("DELETE FROM Subjects WHERE id = ?", (sub_id,))
+                cur.execute("DELETE FROM Courses WHERE id = ?", (cur_id,))
                 con.commit()
-                print(f"Subject '{sub_id}' deleted successfully.")
+                print(f"Subject '{cur_id}' deleted successfully.")
                 return True
             except Exception as e:
                 print("Exception : "+str(e))
@@ -118,76 +121,15 @@ class subject:
         with sqlite3.connect("data/instance.db") as con:
             cur = con.cursor()
             try:
-                con.execute("UPDATE Subjects SET name = ?, description = ? WHERE id = ?",up_data)
+                con.execute("UPDATE Courses SET name = ?, description = ? WHERE id = ?",up_data)
                 con.commit()
                 return True
             except Exception as e:
                 print("Exception : "+str(e))
                 return False
 
-# Chapter
-class chapter:
-    def add(self,chap_data):
-        with sqlite3.connect("data/instance.db") as con:
-            try:
-                cur = con.cursor()
-                cur.execute('''INSERT INTO Chapters (subject_id, chap_code, name, description) VALUES (?,?,?,?)''',chap_data)
-                con.commit()
-                return True
-                print("Added Chapter: "+chap_data[2])
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
 
-    def get(self,sub_id=None):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            if(sub_id != None):
-                cur.execute(f'''SELECT id,chap_code,name,description from Chapters WHERE subject_id = ?''',(sub_id,))
-            else:
-                cur.execute("SELECT * from Chapters")
-            chapters = cur.fetchall()
-            return chapters
-
-    def name(self,id):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            cur.execute(f'''SELECT name from Chapters WHERE id = ?''',(id,))
-            chapter = cur.fetchone()
-            return chapter[0]
-
-    def getsubject(self,id):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            cur.execute(f'''SELECT subject_id from Chapters WHERE id = ?''',(id,))
-            subject = cur.fetchone()
-            return subject[0]
-
-    def remove(self,chap_id):
-        with sqlite3.connect("data/instance.db") as con:
-            try:
-                cur = con.cursor()
-                cur.execute("PRAGMA foreign_keys = ON;")
-                cur.execute("DELETE FROM Chapters WHERE id = ?", (chap_id,))
-                con.commit()
-                print(f"Chapter '{chap_id}' deleted successfully.")
-                return True
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
-    
-    def update(self,up_data):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            try:
-                con.execute("UPDATE Chapters SET name = ?, description = ? WHERE id = ?",up_data)
-                con.commit()
-                return True
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
-
-# Quiz
+# Assignment
 class quiz:
     def add(self,quiz_data):
         with sqlite3.connect("data/instance.db") as con:

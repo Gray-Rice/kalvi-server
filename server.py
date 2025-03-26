@@ -21,17 +21,6 @@ else:
     print("Secrets Missing. Exiting.....")
     exit()
 
-def validate_api_key(required_role):
-    api_key = request.headers.get("X-API-KEY")
-    if not api_key:
-        return jsonify({"error": "Missing API Key"}), 401
-    
-    user_role = sec.check_token(api_key)
-    if not user_role or user_role != required_role:
-        return jsonify({"error": "Unauthorized"}), 403
-    
-    return user_role
-
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({"message": "Welcome to the API"})
@@ -41,7 +30,6 @@ def login():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid input format"}), 400
-    
     username = data.get('username').strip()
     password = data.get('password').strip()
     valid = sec.verify_login(username, password)
@@ -56,18 +44,16 @@ def login():
 
 @app.route('/admin/users', methods=['GET'])
 def admin_user():
-    user_role = validate_api_key("admin")
-    if isinstance(user_role, tuple):
-        return user_role
-    
+    token = request.headers.get("X-API-KEY")
+    if (not sec.check_token(token)):
+        return {"Error": "Unauthorized - Invalid or No API Key Provided"}, 401
     return jsonify({"users": uobj.get()})
 
 @app.route('/add/user/', methods=["POST"])
 def add_user():
-    user_role = validate_api_key("admin")
-    if isinstance(user_role, tuple):
-        return user_role
-    
+    token = request.headers.get("X-API-KEY")
+    if (not sec.check_token(token)):
+        return {"Error": "Unauthorized - Invalid or No API Key Provided"}, 401
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid input format"}), 400
@@ -93,10 +79,9 @@ def add_user():
 
 @app.route('/delete/user/', methods=["POST"])
 def del_user():
-    user_role = validate_api_key("admin")
-    if isinstance(user_role, tuple):
-        return user_role
-    
+    token = request.headers.get("X-API-KEY")
+    if (not sec.check_token(token)):
+        return {"Error": "Unauthorized - Invalid or No API Key Provided"}, 401
     data = request.get_json()
     user_id = data.get("user_id")
     
