@@ -45,7 +45,7 @@ def login():
     
     if valid[0]:
         user = valid[1]
-        return jsonify({"message": "Login successful", "role": user["role"], "token" : sec.get_token(user["id"]) })
+        return jsonify({"role": user["role"], "token" : sec.get_token(user["id"]) })
     else:
         error = "Username does not exist" if valid[1] == "usr" else "Wrong password"
         return jsonify({"error": error}), 401
