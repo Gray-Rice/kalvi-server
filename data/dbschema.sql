@@ -34,7 +34,7 @@ CREATE TABLE Quiz (
     end_date DATETIME NOT NULL,
     duration TEXT NOT NULL,
     description TEXT,
-    FOREIGN KEY (chapter_id) REFERENCES Chapters(id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES Courses(id) ON DELETE CASCADE
 );
 
 -- CREATE TABLE Questions (
