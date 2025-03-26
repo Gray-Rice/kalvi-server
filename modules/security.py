@@ -60,17 +60,18 @@ def active_tokens():
     return tokenlist
 
 
-def check_token(token):
+def check_token(token,role):
     with sqlite3.connect("data/instance.db") as con:
         cur = con.cursor()
-        cur.execute("SELECT * FROM Api WHERE token = ? ",(token,))
+        cur.execute("SELECT * FROM Api WHERE token = ? ",(str(token).strip(),))
         api = cur.fetchone()
         if(api):
             user = users.search(id=api[1])
-            print(f"API Authorized for user ID: {api[1]}")
-            return user
-        else:
-            return False
+            print(user)
+            if(user["role"] == role):
+                print(f"API Authorized for user ID: {api[1]}")
+                return user
+        return False
 
 def start_checkup():
     if(not setup_check()):

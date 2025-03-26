@@ -45,15 +45,15 @@ def login():
 @app.route('/admin/users', methods=['GET'])
 def admin_user():
     token = request.headers.get("X-API-KEY")
-    if (not sec.check_token(token)):
-        return {"Error": "Unauthorized - Invalid or No API Key Provided"}, 401
+    if (sec.check_token(token,"admin") == False):
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
     return jsonify({"users": uobj.get()})
 
 @app.route('/add/user/', methods=["POST"])
 def add_user():
     token = request.headers.get("X-API-KEY")
-    if (not sec.check_token(token)):
-        return {"Error": "Unauthorized - Invalid or No API Key Provided"}, 401
+    if (sec.check_token(token,"admin") == False):
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid input format"}), 400
@@ -80,8 +80,8 @@ def add_user():
 @app.route('/delete/user/', methods=["POST"])
 def del_user():
     token = request.headers.get("X-API-KEY")
-    if (not sec.check_token(token)):
-        return {"Error": "Unauthorized - Invalid or No API Key Provided"}, 401
+    if (sec.check_token(token,"admin") == False):
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
     data = request.get_json()
     user_id = data.get("user_id")
     
