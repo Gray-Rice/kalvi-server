@@ -90,6 +90,48 @@ def del_user():
     else:
         return jsonify({"error": "Error occurred"}), 400
 
+app.route('/add/staff/', methods=["POST"])
+def add_staff():
+    token = request.headers.get("X-API-KEY")
+    if (sec.check_token(token,"admin") == False):
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid input format"}), 400
+    
+    user_data = [
+        data.get('username').strip(),
+        data.get('password').strip(),
+        data.get('fullname').strip(),
+        data.get('qualification').strip(),
+        data.get('dob')
+    ]
+    
+    if not util.valid_mail(user_data[0]):
+        return jsonify({"error": "Username Error: Not a valid email"}), 400
+    
+    if any(i == "" for i in user_data):
+        return jsonify({"error": "Input Error: Check if values entered are correct"}), 400
+    
+    if uobj.add(user_data):
+        return jsonify({"message": "User added successfully"}), 201
+    else:
+        return jsonify({"error": f"Username {user_data[0]} already exists."}), 400
+
+@app.route('/delete/staff', methods=["POST"])
+def del_staff():
+    token = request.headers.get("X-API-KEY")
+    if (sec.check_token(token,"admin") == False):
+        return jsonify({"Error": "Unauthorized - Invalid or No API Key Provided"}), 401
+    data = request.get_json()
+    user_id = data.get("user_id")
+    
+    if uobj.remove(user_id):
+        return jsonify({"message": "User removed"})
+    else:
+        return jsonify({"error": "Error occurred"}), 400
+
+
 @app.route('/logout', methods=['POST'])
 def logout():
     session.clear()

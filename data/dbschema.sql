@@ -9,7 +9,7 @@ CREATE TABLE Users (
     fullname TEXT NOT NULL,
     qualification TEXT,
     dob DATE NOT NULL,
-    role TEXT CHECK(role IN ('admin', 'user', 'faculty')) NOT NULL DEFAULT 'user' 
+    role TEXT CHECK(role IN ('admin', 'student', 'staff')) NOT NULL
 );
 
 CREATE TABLE Api (

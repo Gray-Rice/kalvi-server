@@ -20,7 +20,7 @@ class users():
                 user[0] = user[0].strip()
                 user[1] = hashpwd(user[1].strip())
                 cur = con.cursor()
-                cur.execute(f'''INSERT INTO Users (username, password, fullname, qualification, dob, role) VALUES (?,?,?,?,?,?)''',user)
+                cur.execute(f'''INSERT INTO Users (username, password, fullname, qualification, dob, role) VALUES (?,?,?,?,?,?)''',user+[role])
                 con.commit()
                 print("Added User: "+user[0])
                 return True
