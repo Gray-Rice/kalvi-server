@@ -47,7 +47,7 @@ def get_token(user_id=None):
             cur.execute("SELECT user_id,token FROM Api WHERE user_id != 0")
             tokens = cur.fetchall()
             return tokens
-        print("User has no active API tokens")
+        print("User has no active tokens")
         return None
 
 def active_tokens():
@@ -108,7 +108,7 @@ def create_instance():
                     exit()
                 setup["dbstat"] = True
                 cur = con.cursor()
-                cur.execute(f'''INSERT INTO Users VALUES (0,'admin@qm.com', '{hashpwd(adm_pwd)}', 'admin','admin','2005-1-1','admin')''')
+                cur.execute(f'''INSERT INTO Users VALUES (0,'admin', '{hashpwd(adm_pwd)}', 'admin','admin','2005-1-1','admin')''')
                 con.commit()
                 print("Admin added with defaults.")
                 if(create_token(0)):
