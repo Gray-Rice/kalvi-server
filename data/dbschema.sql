@@ -42,12 +42,12 @@ CREATE TABLE Coursefac (
     fac_id INTEGER NOT NULL,
     slot TEXT CHECK(slot IN ('A', 'B', 'C', 'D', 'E')),
     FOREIGN KEY (fac_id) REFERENCES Users(id) ON DELETE CASCADE
-)
+);
 
 CREATE TABLE Notice (
     title TEXT NOT NULL,
     body TEXT NOT NULL
-)
+);
 
 -- CREATE TABLE Questions (
 --     id INTEGER PRIMARY KEY AUTOINCREMENT,
