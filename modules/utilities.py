@@ -10,7 +10,7 @@ def valid_mail(mail):
 class apitools():
     @staticmethod
     def get_sub():
-        obj = dbm.subject()
+        obj = dbm.course()
         out = []
         for i in obj.get():
             temp = {}

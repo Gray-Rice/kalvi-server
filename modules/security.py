@@ -1,6 +1,15 @@
 import hashlib, os, pickle, sqlite3, secrets, json
 from datetime import date
 from modules.dbmanage import users
+from dotenv import load_dotenv
+
+
+def get_gemkey():
+    key = os.getenv("GEMKEY")
+    if not key:
+        print("API KEY NOT FOUND FOR GEMINI")
+        return None
+    return key
 
 def get_secrets():
     try:

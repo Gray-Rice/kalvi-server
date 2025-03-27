@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS 
 from ast import literal_eval
+import google.generativeai as genai
+
+
 
 # User-defined modules
 import modules.dbmanage as dbm
@@ -9,6 +12,11 @@ import modules.utilities as util
 from modules.utilities import apitools
 
 uobj = dbm.users()
+
+
+# Configure Gemini API
+gem_key = sec.get_gemkey()
+genai.configure(api_key=gem_key)  # Replace with your actual API key
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -20,6 +28,36 @@ if secrets is not None:
 else:
     print("Secrets Missing. Exiting.....")
     exit()
+
+#####################################
+
+@app.route("/api/voice-assistant", methods=["POST"])
+def voice_assistant():
+    try:
+        data = request.json
+        user_query = data.get("user_query")
+        current_page = data.get("current_page")
+        site_structure = data.get("site_structure")
+
+        prompt = f"""
+        You are a study assistant for a university website.
+        The user is currently on: {current_page}.
+        Website structure: {site_structure}
+        Provide study-related answers and website navigation help.
+        User Query: "{user_query}"
+        """
+
+        # Use Gemini model
+        model = genai.GenerativeModel("gemini-1.5-pro-latest")  # Try this model
+        response = model.generate_content(prompt)
+
+        return jsonify({"reply": response.text})
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"reply": "Sorry, there was an issue processing your request."}), 500
+
+#####################################
 
 @app.route("/", methods=["GET"])
 def home():
@@ -41,6 +79,32 @@ def login():
         error = "Username does not exist" if valid[1] == "usr" else "Wrong password"
         return jsonify({"error": error}), 401
 
+############################################# Courses
+@app.route("/get/course",methods=["GET"])
+def get_cour():
+    subjects = apitools.get_sub()
+    if (subjects):
+        return jsonify({"Courses": subjects}), 201
+    return jsonify({"Error": "No subjects found"}), 204
+
+############################################# Notice
+@app.route("/add/notice",methods=["POST"])
+def add_notice():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid input format"}), 400
+    event = [
+        data.get('title').strip(),
+        data.get('body').strip()
+    ]
+    if dbm.note_add(event):
+        return jsonify({"message": "Notice added"}), 201
+    else:
+        return jsonify({"error": "Error occured"}), 400
+    
+@app.route("/get/notice",methods=["GET"])
+def get_notice():
+    return jsonify(get_notice()), 201
 
 ############################################# Course
 

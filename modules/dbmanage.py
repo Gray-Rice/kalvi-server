@@ -158,149 +158,21 @@ class course:
                 print("Exception : "+str(e))
                 return False
 
-
-# Assignment
-class quiz:
-    def add(self,quiz_data):
-        with sqlite3.connect("data/instance.db") as con:
-            try :
-                cur = con.cursor()
-                cur.execute('''INSERT INTO Quiz (chapter_id,name,start_date,end_date,duration,description) VALUES (?,?,?,?,?,?)''',quiz_data)
-                con.commit()
-                print("Quiz Added")
-                return True
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
-
-    def get(self,chapter_id=None,quiz_id=None):
-        with sqlite3.connect("data/instance.db") as con:
+def add_notice(data):
+    with sqlite3.connect("data/instance.db") as con:
+        try:
             cur = con.cursor()
-            if(chapter_id != None):
-                cur.execute(f'''SELECT * FROM Quiz WHERE chapter_id = ?''',(chapter_id,))
-            elif(quiz_id != None):
-                cur.execute(f'''SELECT * FROM Quiz WHERE id = ?''',(quiz_id,))
-            else:
-                cur.execute("SELECT * FROM Quiz")
-            quizes = cur.fetchall()
-            return quizes
-    
-    def name(self,id):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            cur.execute(f'''SELECT name from Quiz WHERE id = ?''',(id,))
-            quiz = cur.fetchone()
-            return quiz[0]
-    
-    def getchapter(self,id):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            cur.execute(f'''SELECT chapter_id from Quiz WHERE id = ?''',(id,))
-            chapter = cur.fetchone()
-            return chapter[0]
-    
-    def update(self,up_data):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            try:
-                con.execute("UPDATE Quiz SET name = ?, quiz_date = ?,duration = ? WHERE id = ?",up_data)
-                con.commit()
-                return True
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
+            cur.execute(f'''INSERT INTO Notice (title,body) VALUES (?,?)''',data)
+            con.commit()
+            print("Added Notice: "+sub_data[1])
+            return True
+        except Exception as e:
+            print("Exception : "+str(e))
+            return False
 
-    def remove(self,quiz_id):
-        with sqlite3.connect("data/instance.db") as con:
-            try:
-                cur = con.cursor()
-                cur.execute("PRAGMA foreign_keys = ON;")
-                cur.execute("DELETE FROM Quiz WHERE id = ?", (quiz_id,))
-                con.commit()
-                print(f"Quiz '{quiz_id}' deleted successfully.")
-                return True
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
-
-#  Questions
-class questions:
-    def add(self,questions):
-        with sqlite3.connect("data/instance.db") as con:
-            try:
-                cur = con.cursor()
-                for q in questions:
-                    cur.execute('''INSERT INTO Questions (quiz_id, qstatement, opt1,opt2,opt3,opt4,copt) VALUES (?,?,?,?,?,?,?)''',q)
-                con.commit()
-                print("Questions added")
-                return True
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
-
-    def get(self,quiz_id=None):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            if(quiz_id != None):
-                cur.execute(f'''SELECT * FROM Questions WHERE quiz_id = ?''',(quiz_id,))
-            else:
-                cur.execute("SELECT * FROM Questions")
-            questions = cur.fetchall()
-            return questions
-
-    def update(self,up_data):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            try:
-                con.execute("UPDATE Questions SET qstatement = ?,opt1 = ?,opt2 = ?,opt3  = ?,opt4  = ?,copt = ? WHERE id = ?",up_data)
-                con.commit()
-                return True
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
-
-    def remove(self,qid):
-        with sqlite3.connect("data/instance.db") as con:
-            try:
-                cur = con.cursor()
-                cur.execute("PRAGMA foreign_keys = ON;") 
-                cur.execute("DELETE FROM Questions WHERE id = ?", (qid,))
-                con.commit()
-                print(f"Question '{qid}' deleted successfully.")
-            except Exception as e:
-                print("Exception : "+str(e))
-                return False
-
-# Scores
-class score:
-    def add(self,score_data):
-        with sqlite3.connect("data/instance.db") as con:
-            try:
-                cur = con.cursor()
-                cur.execute(f'''INSERT INTO Scores (quiz_id, user_id, report,marks,ratio) VALUES (?,?,?,?,?)''',score_data)
-                con.commit()
-                print("Attempt Recorded")
-                return True
-            except sqlite3.IntegrityError :
-                return False
-
-    def get_report(self,report_id):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            cur.execute(f'''SELECT quiz_id,marks,ratio,report,time_stamp FROM Scores WHERE id = ?''',(report_id,))
-            report = cur.fetchall()
-            return report[0]
-
-    def get(self,user_id=None,quiz_id=None):
-        with sqlite3.connect("data/instance.db") as con:
-            cur = con.cursor()
-            if( user_id == None and quiz_id != None):
-                cur.execute(f'''SELECT * FROM Scores WHERE quiz_id = ?''',(quiz_id,))
-            elif( user_id != None and quiz_id == None):
-                cur.execute(f'''SELECT quiz_id,id,time_stamp,marks,ratio FROM Scores WHERE user_id = ?''',(user_id,))
-            elif(user_id and quiz_id):
-                cur.execute(f'''SELECT * FROM Scores WHERE quiz_id = ? AND user_id = ?''',(quiz_id,user_id))
-            else:
-                cur.execute("SELECT * FROM Scores")
-            scores = cur.fetchall()
-            return scores
+def get_notice():
+    with sqlite3.connect("data/instance.db") as con:
+        cur = con.cursor()
+        cur.execute(f'''SELECT * from Notice''')
+        subjects = cur.fetchall()
+        return notices

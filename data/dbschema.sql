@@ -44,6 +44,11 @@ CREATE TABLE Coursefac (
     FOREIGN KEY (fac_id) REFERENCES Users(id) ON DELETE CASCADE
 )
 
+CREATE TABLE Notice (
+    title TEXT NOT NULL,
+    body TEXT NOT NULL
+)
+
 -- CREATE TABLE Questions (
 --     id INTEGER PRIMARY KEY AUTOINCREMENT,
 --     quiz_id INTEGER NOT NULL,
