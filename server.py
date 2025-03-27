@@ -53,6 +53,14 @@ def admin_course():
 
     return jsonify({"courses": course.get()}), 200
 
+
+@app.route("/get/faculty",methods=["GET"])
+def avail_fac():
+    d = {}
+    d["available"] = dbm.get_available_faculties()
+    d["assigned"] = dbm.get_course_faculty_details()
+    return jsonify(d), 200
+
 ############################################################ Course paths
 
 @app.route("/add/course", methods=["POST"])
@@ -150,6 +158,8 @@ def add_user():
     ]
     
     if uobj.add(user_data):
+        usr = uobj.search(user_data[0])
+        sec.create_token(usr["id"])
         return jsonify({"message": "User added successfully"}), 201
     else:
         return jsonify({"error": f"Username {user_data[0]} already exists."}), 400

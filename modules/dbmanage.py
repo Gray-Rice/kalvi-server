@@ -13,6 +13,36 @@ def get_role(username):
         if(user != None):
             return user[0]
 
+
+import sqlite3
+
+def get_available_faculties():
+    with sqlite3.connect("data/instance.db") as conn:
+        query = """
+        SELECT id, username, fullname, qualification, dob
+        FROM Users
+        WHERE role = 'staff' 
+        AND id NOT IN (SELECT fac_id FROM Coursefac);
+        """
+        cursor = conn.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return [{"id": row[0], "username": row[1], "fullname": row[2], "qualification": row[3], "dob": row[4]} for row in result]
+
+def get_course_faculty_details():
+    with sqlite3.connect("data/instance.db") as conn:
+        query = """
+        SELECT c.course_id, c.fac_id, u.username, u.fullname, c.slot
+        FROM Coursefac c
+        JOIN Users u ON c.fac_id = u.id;
+        """
+        cursor = conn.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return [{"course_id": row[0], "fac_id": row[1], "username": row[2], "fullname": row[3], "slot": row[4]} for row in result]
+
+
+
 class users():
     def add(self,user,role="student"):
         with sqlite3.connect("data/instance.db") as con:

@@ -37,6 +37,13 @@ CREATE TABLE Assignment (
     FOREIGN KEY (course_id) REFERENCES Courses(id) ON DELETE CASCADE
 );
 
+CREATE TABLE Coursefac (
+    course_id INTEGER NOT NULL,
+    fac_id INTEGER NOT NULL,
+    slot TEXT CHECK(slot IN ('A', 'B', 'C', 'D', 'E')),
+    FOREIGN KEY (fac_id) REFERENCES Users(id) ON DELETE CASCADE
+)
+
 -- CREATE TABLE Questions (
 --     id INTEGER PRIMARY KEY AUTOINCREMENT,
 --     quiz_id INTEGER NOT NULL,
